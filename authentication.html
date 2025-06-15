@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Page</title>
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #305cd4, #292829, #844bee);
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .card h1, .card h2 {
+            text-align: center;
+            color: #1f2937;
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .card h1 {
+            font-size: 2.25rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+        input::placeholder {
+            color: #9ca3af;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            min-height: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 0.5rem;
+            position: relative;
+        }
+        .primary-button {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+        .primary-button:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+        .secondary-button {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .secondary-button:hover:not(:disabled) {
+            background-color: #d1d5db;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .hidden {
+            display: none;
+        }
+        .welcome-text {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Signup Page -->
+    <div id="signup-page" class="page" role="main" aria-label="Sign Up Page">
+        <div class="card">
+            <h1>Sign Up</h1>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Enter your email" required aria-describedby="email-error">
+                <div class="error-message" id="email-error" role="alert"></div>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Enter password" required aria-describedby="password-error">
+                <div class="error-message" id="password-error" role="alert"></div>
+            </div>
+            <div class="form-group">
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" required aria-describedby="confirmPassword-error">
+                <div class="error-message" id="confirmPassword-error" role="alert"></div>
+            </div>
+            <div class="form-group">
+                <input type="tel" id="phone1" placeholder="Phone 1" required aria-describedby="phone1-error">
+                <div class="error-message" id="phone1-error" role="alert"></div>
+            </div>
+            <div class="form-group">
+                <input type="tel" id="phone2" placeholder="Phone 2 (optional)" aria-describedby="phone2-error">
+                <div class="error-message" id="phone2-error" role="alert"></div>
+            </div>
+            <button class="primary-button" onclick="validateSignup()">Continue</button>
+            <button class="secondary-button" onclick="showContentPage()">Sign In</button>
+        </div>
+    </div>
+
+    <!-- Sign In Page -->
+    <div id="content-page" class="page hidden" role="main" aria-label="Sign In Page">
+        <div class="card">
+            <h2>Sign In</h2>
+            <div class="form-group">
+                <input type="email" id="login-email" placeholder="Enter your email" required aria-describedby="login-email-error">
+                <div class="error-message" id="login-email-error" role="alert"></div>
+            </div>
+            <div class="form-group">
+                <input type="password" id="login-password" placeholder="Enter your password" required aria-describedby="login-password-error">
+                <div class="error-message" id="login-password-error" role="alert"></div>
+            </div>
+            <button class="primary-button" onclick="validateLogin()">Sign In</button>
+            <button class="secondary-button" onclick="showSignupPage()">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Welcome Page -->
+    <div id="welcome-page" class="page hidden" role="main" aria-label="Welcome Page">
+        <div class="card">
+            <h1>Welcome!</h1>
+            <p class="welcome-text">You have successfully authenticated.</p>
+            <button class="primary-button" onclick="logout()">Log Out</button>
+        </div>
+    </div>
+
+    <script>
+        // Simple hash function for demo (not secure for production)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+
+        // Sanitize input to prevent XSS
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+
+        // Clear form fields
+        function clearForm(fields) {
+            fields.forEach(id => {
+                document.getElementById(id).value = '';
+                document.getElementById(`${id}-error`).textContent = '';
+            });
+        }
+
+        // Show Content Page
+        function showContentPage() {
+            document.getElementById('signup-page').classList.add('hidden');
+            document.getElementById('content-page').classList.remove('hidden');
+            document.getElementById('welcome-page').classList.add('hidden');
+            clearForm(['email', 'password', 'confirmPassword', 'phone1', 'phone2']);
+        }
+
+        // Show Signup Page
+        function showSignupPage() {
+            document.getElementById('content-page').classList.add('hidden');
+            document.getElementById('signup-page').classList.remove('hidden');
+            document.getElementById('welcome-page').classList.add('hidden');
+            clearForm(['login-email', 'login-password']);
+        }
+
+        // Show Welcome Page
+        function showWelcomePage() {
+            document.getElementById('signup-page').classList.add('hidden');
+            document.getElementById('content-page').classList.add('hidden');
+            document.getElementById('welcome-page').classList.remove('hidden');
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to log out?')) {
+                showSignupPage();
+            }
+        }
+
+        // Validate Email
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        // Validate Password
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasDigit = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*]/.test(password);
+
+            if (password.length < minLength) {
+                return "Password must be at least 8 characters long.";
+            }
+            if (!hasUpperCase) {
+                return "Password must contain at least one uppercase letter.";
+            }
+            if (!hasLowerCase) {
+                return "Password must contain at least one lowercase letter.";
+            }
+            if (!hasDigit) {
+                return "Password must contain at least one digit.";
+            }
+            if (!hasSpecialChar) {
+                return "Password must contain at least one special character (!@#$%^&*).";
+            }
+            return null; // No error
+        }
+
+        // Validate Phone Number
+        function validatePhone(phone) {
+            const regex = /^\d{10}$/;
+            return regex.test(phone);
+        }
+
+        // Validate Signup Form
+        async function validateSignup() {
+            const button = event.target;
+            button.disabled = true;
+            button.classList.add('loading');
+            button.textContent = 'Processing...';
+
+            const email = sanitizeInput(document.getElementById('email').value);
+            const password = sanitizeInput(document.getElementById('password').value);
+            const confirmPassword = sanitizeInput(document.getElementById('confirmPassword').value);
+            const phone1 = sanitizeInput(document.getElementById('phone1').value);
+            const phone2 = sanitizeInput(document.getElementById('phone2').value);
+
+            // Clear previous errors
+            document.getElementById('email-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
+            document.getElementById('confirmPassword-error').textContent = '';
+            document.getElementById('phone1-error').textContent = '';
+            document.getElementById('phone2-error').textContent = '';
+
+            let isValid = true;
+
+            // Validate Email
+            if (!validateEmail(email)) {
+                document.getElementById('email-error').textContent = 'Invalid email format.';
+                isValid = false;
+            }
+
+            // Check if email already exists
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[email]) {
+                document.getElementById('email-error').textContent = 'Email already registered.';
+                isValid = false;
+            }
+
+            // Validate Password
+            const passwordError = validatePassword(password);
+            if (passwordError) {
+                document.getElementById('password-error').textContent = passwordError;
+                isValid = false;
+            }
+
+            // Validate Confirm Password
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPassword-error').textContent = 'Passwords do not match.';
+                isValid = false;
+            }
+
+            // Validate Phone 1
+            if (!validatePhone(phone1)) {
+                document.getElementById('phone1-error').textContent = 'Phone 1 must be 10 digits.';
+                isValid = false;
+            }
+
+            // Validate Phone 2 (if provided)
+            if (phone2 && !validatePhone(phone2)) {
+                document.getElementById('phone2-error').textContent = 'Phone 2 must be 10 digits.';
+                isValid = false;
+            }
+
+            // Simulate async processing
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // If all valid, store credentials and proceed
+            if (isValid) {
+                users[email] = { password: simpleHash(password), phone1, phone2 };
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('Signup successful!');
+                showWelcomePage();
+                clearForm(['email', 'password', 'confirmPassword', 'phone1', 'phone2']);
+            }
+
+            button.disabled = false;
+            button.classList.remove('loading');
+            button.textContent = 'Continue';
+        }
+
+        // Validate Login Form
+        async function validateLogin() {
+            const button = event.target;
+            button.disabled = true;
+            button.classList.add('loading');
+            button.textContent = 'Processing...';
+
+            const email = sanitizeInput(document.getElementById('login-email').value);
+            const password = sanitizeInput(document.getElementById('login-password').value);
+
+            document.getElementById('login-email-error').textContent = '';
+            document.getElementById('login-password-error').textContent = '';
+
+            let isValid = true;
+
+            if (!validateEmail(email)) {
+                document.getElementById('login-email-error').textContent = 'Invalid email format.';
+                isValid = false;
+            }
+
+            // Check credentials against localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (!users[email]) {
+                document.getElementById('login-email-error').textContent = 'Email not found.';
+                isValid = false;
+            } else if (users[email].password !== simpleHash(password)) {
+                document.getElementById('login-password-error').textContent = 'Incorrect password.';
+                isValid = false;
+            }
+
+            // Simulate async processing
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // If all valid, proceed
+            if (isValid) {
+                alert('Login successful!');
+                showWelcomePage();
+                clearForm(['login-email', 'login-password']);
+            }
+
+            button.disabled = false;
+            button.classList.remove('loading');
+            button.textContent = 'Sign In';
+        }
+    </script>
+</body>
+</html>
