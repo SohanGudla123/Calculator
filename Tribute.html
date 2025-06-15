@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tribute to Rabindranath Tagore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lora', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        nav {
+            position: sticky;
+            top: 0;
+            background-color: #4b0082;
+            padding: 10px 0;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background-color: #4b0082;
+            color: white;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .intro {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .timeline {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .timeline h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .timeline-card {
+            background-color: #e6e6fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        .timeline-card:hover {
+            transform: translateY(-5px);
+        }
+        .quotes-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .quotes-section h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .quote-card {
+            background-color: #e6e6fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #4b0082;
+            border-radius: 5px;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+        .quote-card:nth-child(1) { animation-delay: 0.2s; }
+        .quote-card:nth-child(2) { animation-delay: 0.4s; }
+        .quote-card:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .media-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .media-links a {
+            color: #4b0082;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .media-links a:hover {
+            text-decoration: underline;
+        }
+        .poem-link {
+            cursor: pointer;
+            color: #4b0082;
+            text-decoration: underline;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .carousel {
+            text-align: center;
+        }
+        .carousel-button {
+            background: #4b0082;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .carousel-button:hover {
+            background: #6a0dad;
+        }
+        .poem {
+            display: none;
+        }
+        .poem.active {
+            display: block;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4b0082;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 1em;
+            display: none;
+            z-index: 100;
+        }
+        .back-to-top:hover {
+            background-color: #6a0dad;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #4b0082;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            .timeline, .quotes-section {
+                max-height: 300px;
+            }
+            .image-container img {
+                width: 80%;
+            }
+            .intro {
+                font-size: 0.9em;
+            }
+            nav a {
+                margin: 0 10px;
+                font-size: 0.9em;
+            }
+            .back-to-top {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+            .modal-content {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#intro">Intro</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#quotes">Quotes</a>
+        <a href="#media">Media</a>
+    </nav>
+    <header>
+        <h1>Rabindranath Tagore</h1>
+    </header>
+    <div class="container">
+        <div id="intro" class="intro">
+            <p>Rabindranath Tagore (1861–1941) was a Bengali poet, philosopher, and polymath who reshaped Indian literature and music. Best known for his Nobel Prize-winning work <em>Gitanjali</em>, Tagore’s poetry, stories, and songs continue to inspire millions. He was a visionary who founded Visva-Bharati University and championed universal humanism.</p>
+        </div>
+        <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/Rabindranath_Tagore_unknown_location.jpg" alt="Rabindranath Tagore">
+        </div>
+        <div id="timeline" class="timeline">
+            <h2>Timeline of Achievements</h2>
+            <div class="timeline-card">
+                <h3>1861</h3>
+                <p>Born on May 7 in Kolkata, India, into a prominent Bengali family.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1901</h3>
+                <p>Founded a school in Santiniketan, which later became Visva-Bharati University.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1913</h3>
+                <p>Awarded the Nobel Prize in Literature for his collection of poems, <em>Gitanjali</em>, becoming the first non-European laureate.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1915</h3>
+                <p>Knighted by the British Crown, later renounced in 1919 in protest of the Jallianwala Bagh massacre.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1919</h3>
+                <p>Wrote a letter condemning the Jallianwala Bagh massacre, renouncing his knighthood as a protest against British oppression.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1921</h3>
+                <p>Founded Visva-Bharati University in Santiniketan, promoting global education and cultural exchange.</p>
+            </div>
+            <div class="timeline-card">
+                <h3>1941</h3>
+                <p>Passed away on August 7, leaving a legacy as a poet, philosopher, and cultural icon.</p>
+            </div>
+        </div>
+        <div id="quotes" class="quotes-section">
+            <h2>Inspirational Quotes</h2>
+            <div class="quote-card">
+                <p>"You can't cross the sea merely by standing and staring at the water."</p>
+            </div>
+            <div class="quote-card">
+                <p>"Let your life lightly dance on the edges of time like dew on the tip of a leaf."</p>
+            </div>
+            <div class="quote-card">
+                <p>"Faith is the bird that feels the light when the dawn is still dark."</p>
+            </div>
+        </div>
+        <div id="media" class="media-links">
+            <p>Explore more about Tagore:</p>
+            <a href="https://en.wikipedia.org/wiki/Rabindranath_Tagore" target="_blank">Wikipedia</a>
+            <a href="https://www.youtube.com/watch?v=7g46yvS3znY" target="_blank">Tagore's Works</a>
+            <a href="https://www.gutenberg.org/ebooks/7164" target="_blank">Read <em>Gitanjali</em></a>
+            <p><span class="poem-link" onclick="openModal()">Read <em>Gitanjali</em> Poems</span></p>
+        </div>
+    </div>
+    <div id="poemModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <div class="carousel">
+                <div class="poem active" id="poem1">
+                    <h2>Gitanjali Poem 35</h2>
+                    <p>
+                        Where the mind is without fear and the head is held high;<br>
+                        Where knowledge is free;<br>
+                        Where the world has not been broken up into fragments by narrow domestic walls;<br>
+                        Where words come out from the depth of truth;<br>
+                        Where tireless striving stretches its arms towards perfection;<br>
+                        Where the clear stream of reason has not lost its way into the dreary desert sand of dead habit;<br>
+                        Where the mind is led forward by thee into ever-widening thought and action—<br>
+                        Into that heaven of freedom, my Father, let my country awake.
+                    </p>
+                </div>
+                <div class="poem" id="poem2">
+                    <h2>Gitanjali Poem 36</h2>
+                    <p>
+                        This is my prayer to thee, my lord—strike, strike at the root of penury in my heart.<br>
+                        Give me the strength lightly to bear my joys and sorrows.<br>
+                        Give me the strength to make my love fruitful in service.<br>
+                        Give me the strength never to disown the poor or bend my knees before insolent might.<br>
+                        Give me the strength to raise my mind high above daily trifles.<br>
+                        And give me the strength to surrender my strength to thy will with love.
+                    </p>
+                </div>
+                <button class="carousel-button" onclick="showPoem('prev')">Previous</button>
+                <button class="carousel-button" onclick="showPoem('next')">Next</button>
+            </div>
+        </div>
+    </div>
+    <a href="#top" class="back-to-top" id="backToTop">↑</a>
+    <footer>
+        <p>Tribute Page © 2025 | Dedicated to Rabindranath Tagore</p>
+    </footer>
+    <script>
+        window.onscroll = function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        };
+
+        let currentPoem = 1;
+        function showPoem(direction) {
+            document.getElementById(`poem${currentPoem}`).classList.remove('active');
+            if (direction === 'next') {
+                currentPoem = currentPoem < 2 ? currentPoem + 1 : 1;
+            } else {
+                currentPoem = currentPoem > 1 ? currentPoem - 1 : 2;
+            }
+            document.getElementById(`poem${currentPoem}`).classList.add('active');
+        }
+
+        function openModal() {
+            document.getElementById('poemModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('poemModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('poemModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
