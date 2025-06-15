@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #d8bfd8, #f08080);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            width: 360px;
+            text-align: center;
+        }
+        .dark .calculator {
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+        .calculator-heading {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .dark .calculator-heading {
+            color: #fff;
+        }
+        #mini-display {
+            width: 100%;
+            height: 30px;
+            font-size: 16px;
+            text-align: right;
+            margin-bottom: 8px;
+            padding: 5px;
+            border: 2px solid #b0b0b0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .dark #mini-display {
+            background-color: #3c3c3c;
+            color: #fff;
+            border-color: #5a5a5a;
+        }
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 2px solid #b0b0b0;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .dark #display {
+            background-color: #3c3c3c;
+            color: #fff;
+            border-color: #5a5a5a;
+        }
+        #history {
+            max-height: 80px;
+            overflow-y: auto;
+            font-size: 14px;
+            text-align: left;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #b0b0b0;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+        .dark #history {
+            background-color: #3c3c3c;
+            color: #fff;
+            border-color: #5a5a5a;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #e6e6e6;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #d4d4d4;
+        }
+        .dark button {
+            background-color: #4a4a4a;
+            color: #fff;
+        }
+        .dark button:hover {
+            background-color: #5e5e5e;
+        }
+        .operator {
+            background-color: #ff8c00;
+            color: white;
+        }
+        .operator:hover {
+            background-color: #e67e22;
+        }
+        .dark .operator {
+            background-color: #d97500;
+        }
+        .dark .operator:hover {
+            background-color: #bf6b00;
+        }
+        .function {
+            background-color: #4682b4;
+            color: white;
+        }
+        .function:hover {
+            background-color: #3a6f9b;
+        }
+        .dark .function {
+            background-color: #315f80;
+        }
+        .dark .function:hover {
+            background-color: #2a506e;
+        }
+        .control {
+            background-color: #dc143c;
+            color: white;
+        }
+        .control:hover {
+            background-color: #c11235;
+        }
+        .dark .control {
+            background-color: #b3102f;
+        }
+        .dark .control:hover {
+            background-color: #9e0e2a;
+        }
+        #theme-toggle {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background-color: #20b2aa;
+            color: white;
+        }
+        #theme-toggle:hover {
+            background-color: #1a9991;
+        }
+        .dark #theme-toggle {
+            background-color: #188f88;
+        }
+        .dark #theme-toggle:hover {
+            background-color: #157a74;
+        }
+        #error {
+            color: #dc143c;
+            font-size: 14px;
+            margin-top: 5px;
+            height: 20px;
+        }
+        .dark #error {
+            color: #ff4040;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="calculator-heading">CALCULATOR</div>
+        <input type="text" id="mini-display" readonly value="0">
+        <input type="text" id="display" readonly value="0">
+        <div id="error"></div>
+        <div id="history"></div>
+        <div class="buttons">
+            <button class="control" id="clear">C</button>
+            <button class="function" id="paren-open">(</button>
+            <button class="function" id="paren-close">)</button>
+            <button class="function" id="pi">π</button>
+            <button class="function" id="sqrt">√</button>
+            <button id="7">7</button>
+            <button id="8">8</button>
+            <button id="9">9</button>
+            <button class="operator" id="divide">/</button>
+            <button class="function" id="sin">sin</button>
+            <button id="4">4</button>
+            <button id="5">5</button>
+            <button id="6">6</button>
+            <button class="operator" id="multiply">*</button>
+            <button class="function" id="cos">cos</button>
+            <button id="1">1</button>
+            <button id="2">2</button>
+            <button id="3">3</button>
+            <button class="operator" id="subtract">-</button>
+            <button class="function" id="tan">tan</button>
+            <button id="0">0</button>
+            <button id="decimal">.</button>
+            <button class="function" id="percent">%</button>
+            <button class="operator" id="add">+</button>
+            <button class="function" id="pow">x²</button>
+            <button class="function" id="sign">±</button>
+            <button class="function" id="m-plus">M+</button>
+            <button class="control" id="backspace">←</button>
+            <button class="control" id="undo">Undo</button>
+            <button class="control" id="equals">=</button>
+            <button id="theme-toggle">Toggle Theme</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const miniDisplay = document.getElementById('mini-display');
+        const errorDisplay = document.getElementById('error');
+        const historyDisplay = document.getElementById('history');
+        let currentInput = '0';
+        let memory = 0;
+        let calculationHistory = [];
+        let undoStack = [];
+
+        function updateDisplay() {
+            display.value = currentInput;
+            miniDisplay.value = currentInput;
+            errorDisplay.textContent = '';
+        }
+
+        function showError(message) {
+            errorDisplay.textContent = message;
+        }
+
+        function updateHistory(expression, result) {
+            calculationHistory.unshift(`${expression} = ${result}`);
+            if (calculationHistory.length > 5) calculationHistory.pop();
+            historyDisplay.innerHTML = calculationHistory.join('<br>');
+        }
+
+        function saveState() {
+            undoStack.push({ input: currentInput, memory: memory });
+            if (undoStack.length > 10) undoStack.shift();
+        }
+
+        function handleNumber(number) {
+            if (currentInput === '0') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            saveState();
+            updateDisplay();
+        }
+
+        function handleOperator(op) {
+            currentInput += op;
+            saveState();
+            updateDisplay();
+        }
+
+        function handleFunction(func) {
+            if (func === 'pi') {
+                currentInput = currentInput === '0' ? '3.14159' : currentInput + '3.14159';
+            } else {
+                currentInput += `${func}(`;
+            }
+            saveState();
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                const result = math.evaluate(currentInput);
+                if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
+                    showError('Invalid calculation');
+                    return 'Error';
+                }
+                updateHistory(currentInput, result);
+                return Math.round(result * 1000000) / 1000000;
+            } catch (e) {
+                showError('Invalid expression');
+                return 'Error';
+            }
+        }
+
+        function handleEquals() {
+            saveState();
+            const result = calculate();
+            if (result === 'Error') return;
+            currentInput = String(result);
+            updateDisplay();
+        }
+
+        function clear() {
+            saveState();
+            currentInput = '0';
+            memory = 0;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentInput !== '0') {
+                saveState();
+                currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
+                updateDisplay();
+            }
+        }
+
+        function addDecimal() {
+            if (!currentInput.slice(-1).match(/[0-9]/)) {
+                currentInput += '0.';
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            saveState();
+            updateDisplay();
+        }
+
+        function handlePercentage() {
+            saveState();
+            const value = parseFloat(currentInput) / 100;
+            currentInput = String(value);
+            updateDisplay();
+        }
+
+        function handleBackspace() {
+            saveState();
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            const value = parseFloat(currentInput);
+            if (!isNaN(value)) {
+                saveState();
+                memory += value;
+            }
+        }
+
+        function handleUndo() {
+            if (undoStack.length > 0) {
+                const lastState = undoStack.pop();
+                currentInput = lastState.input;
+                memory = lastState.memory;
+                updateDisplay();
+            }
+        }
+
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.id;
+                if (id >= '0' && id <= '9') {
+                    handleNumber(id);
+                } else if (['add', 'subtract', 'multiply', 'divide', 'paren-open', 'paren-close'].includes(id)) {
+                    handleOperator(button.textContent);
+                } else if (['sqrt', 'sin', 'cos', 'tan', 'pi'].includes(id)) {
+                    handleFunction(id);
+                } else if (id === 'pow') {
+                    handleOperator('^2');
+                } else if (id === 'equals') {
+                    handleEquals();
+                } else if (id === 'clear') {
+                    clear();
+                } else if (id === 'sign') {
+                    toggleSign();
+                } else if (id === 'decimal') {
+                    addDecimal();
+                } else if (id === 'percent') {
+                    handlePercentage();
+                } else if (id === 'backspace') {
+                    handleBackspace();
+                } else if (id === 'm-plus') {
+                    memoryAdd();
+                } else if (id === 'undo') {
+                    handleUndo();
+                } else if (id === 'theme-toggle') {
+                    document.body.classList.toggle('dark');
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (key >= '0' && key <= '9') {
+                handleNumber(key);
+            } else if (key === '+' || key === '-' || key === '*' || key === '/' || key === '(' || key === ')') {
+                handleOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                handleEquals();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clear();
+            } else if (key === '.') {
+                addDecimal();
+            } else if (key === 'n') {
+                toggleSign();
+            } else if (key === '%') {
+                handlePercentage();
+            } else if (key === 'Backspace') {
+                handleBackspace();
+            } else if (key === 'm') {
+                memoryAdd();
+            } else if (key === 'p') {
+                handleFunction('pi');
+            } else if (key === 'u') {
+                handleUndo();
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
